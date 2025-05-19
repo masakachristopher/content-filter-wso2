@@ -1,6 +1,6 @@
 <sequence name="content-filter-in-sequence" onError="content-filter-fault-sequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <property expression="json-eval($.users[?(@.active == true)])" name="activeUsers" scope="default" type="JSON" />
- 
+    <property expression="json-eval($.users[?(@.active == true)])" name="activeUsers" scope="default"/>
+
     <enrich>
         <source clone="true" type="inline"> 
         {
@@ -10,15 +10,23 @@
         <target action="replace" type="body"/>
     </enrich>
 
-    <enrich>
-        <source clone="false" property="activeUsers" type="property"/>
-        <target action="replace" xpath="json-eval($.users)"/>
-    </enrich>
-
-    <log level="custom">
-        <property expression="$ctx:activeUsers" name="filter-route" scope="default" type="STRING" />
-    </log>
-
+    <filter xpath="$ctx:activeUsers != '[]'">
+        <then>
+            <log level="custom">
+                <property value="Filtered active items successfully" name="filter-route" scope="default" type="STRING" />
+            </log>
+            <enrich>
+                <source clone="false" property="activeUsers" type="property"/>
+                <target action="replace" xpath="json-eval($.users)"/>
+            </enrich>
+        </then>
+        <else>
+            <log level="custom">
+                <property value="No active items found" name="filter-route" scope="default" type="STRING" />
+            </log>
+        </else>
+    </filter>
+   
     <property value="200" name="HTTP_SC" scope="axis2" type="STRING"/>
     <respond/>
 
