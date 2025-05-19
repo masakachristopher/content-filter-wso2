@@ -1,0 +1,3 @@
+<api context="/filter" name="content-filter-api" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" inSequence="content-filter-in-sequence" faultSequence="content-filter-fault-sequence"/>
+</api>

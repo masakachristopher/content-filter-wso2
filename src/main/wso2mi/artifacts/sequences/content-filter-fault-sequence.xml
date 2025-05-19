@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="content-filter-fault-sequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <property name="currentTime" expression="get-property(&quot;SYSTEM_DATE&quot;, &quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;)" scope="default"/>
+
+    <payloadFactory media-type="json">
+        <format>
+            {
+                "message": "$1",
+                "error": "Internal Server Error",
+                "timestamp": "$2",
+                "status": 500
+            }
+        </format>
+        <args>
+            <arg evaluator="xml" expression="$ctx:ERROR_MESSAGE" />
+            <arg evaluator="xml" expression="$ctx:currentTime" />
+        </args>
+    </payloadFactory>
+    <property value="500" name="HTTP_SC" scope="axis2" type="STRING"/>
+    <respond/>
+</sequence>

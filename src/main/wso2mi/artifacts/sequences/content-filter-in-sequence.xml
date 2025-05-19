@@ -1,0 +1,25 @@
+<sequence name="content-filter-in-sequence" onError="content-filter-fault-sequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <property expression="json-eval($.users[?(@.active == true)])" name="activeUsers" scope="default" type="JSON" />
+ 
+    <enrich>
+        <source clone="true" type="inline"> 
+        {
+            "users" : []
+        } 
+        </source>
+        <target action="replace" type="body"/>
+    </enrich>
+
+    <enrich>
+        <source clone="false" property="activeUsers" type="property"/>
+        <target action="replace" xpath="json-eval($.users)"/>
+    </enrich>
+
+    <log level="custom">
+        <property expression="$ctx:activeUsers" name="filter-route" scope="default" type="STRING" />
+    </log>
+
+    <property value="200" name="HTTP_SC" scope="axis2" type="STRING"/>
+    <respond/>
+
+</sequence>
